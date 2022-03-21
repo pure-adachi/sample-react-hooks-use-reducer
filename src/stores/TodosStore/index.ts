@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useReducer } from "react";
+import { reducer } from "./Reducer";
 import { TodosStore } from "../../types";
 import { dummyFetch } from "../../DummyFetch";
 
@@ -21,37 +22,18 @@ export const initialState: TodosStore.State = {
 };
 
 export function useStore() {
-  const [loading, setLoading] = useState(initialState.loading);
-  const [todos, setTodos] = useState(initialState.todos);
-
-  const state: TodosStore.State = {
-    loading,
-    todos,
-  };
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   const dispatchAddTodo = (name: string) => {
-    setLoading(true);
+    dispatch({ type: "fetch" });
 
-    return dummyFetch().then(() => {
-      setTodos([
-        ...todos,
-        {
-          id: new Date().getTime(),
-          name,
-        },
-      ]);
-
-      setLoading(false);
-    });
+    return dummyFetch().then(() => dispatch({ type: "add", data: { name } }));
   };
 
   const dispatchDelTodo = (id: number) => {
-    setLoading(true);
+    dispatch({ type: "fetch" });
 
-    return dummyFetch().then(() => {
-      setTodos(todos.filter((todo) => todo.id !== id));
-      setLoading(false);
-    });
+    return dummyFetch().then(() => dispatch({ type: "del", data: { id } }));
   };
 
   const store: TodosStore.Store = {
